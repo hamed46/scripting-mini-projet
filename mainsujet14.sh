@@ -1,0 +1,110 @@
+#! /bin/bash
+
+while [ "$option1" != 4 ]
+do
+option1=$(zenity --entry --title="MAIN" --text="
+
+----------------MENU PRINCIPAL------------------
+1)-Gestionnaire des packages
+2)-Sauvegard
+3)-Help?
+4)-Quit?
+------------------------------------------------")
+
+case $option1 in
+	1)
+option2=$(zenity --entry --title="MAIN" --text="
+----------------SOUS MENU1-----------------------
+-inside
+-list
+-desc
+-end
+-------------------------------------------------")
+
+case $option2 in
+	-inside)
+clear
+echo "nom du Commande/fichier?"
+filename=$(zenity --entry --title="Question" --text="nom du Commande/fichier?")
+
+clear
+echo "File/Command's path:"
+locate $filename
+
+
+dpkg-query --search locate $filename | tail -1 | cut -d' ' -f1
+pname=$(dpkg-query --search locate $filename | tail -1 | cut -d' ' -f1 | sed 's/.$//')
+clear
+echo "Name of package:"
+echo "$pname"
+	;;
+	-list)
+clear
+pname=$(zenity --entry --title="Question" --text="Package's name?")
+clear
+echo "Components of package: $pname"
+dpkg-query -L "$pname" | xargs -n 1 basename
+	;;
+	-desc)
+clear
+pname=$(zenity --entry --title="Question" --text="Package's name?")
+
+descriptionnum=awk '/Description/{print NR}' sujet14.sh
+echo "Description of package: $pname"
+dpkg-query -s $pname
+	;;
+	-end)
+zenity --question --title="QUIT" --text="Are you sure you want to quit?"
+	;;
+	*)
+zenity --warning --title="Warning" --text="Choix incorrecte"
+	;;
+esac	
+	;;
+
+	2)
+option3=$(zenity --entry --title="MAIN" --text="
+----------------SOUS MENU2-----------------------
+1)-save
+2)-end
+-------------------------------------------------")
+case $option3 in
+	-save)
+pname=$(zenity --entry --title="Question" --text="Package's name?")
+clear
+test=$(dpkg-query -W -f'${Status}' "$pname" 2>/dev/null | grep -q "ok installed")
+if [ -n $test ]; then
+zenity --entry --title="MAIN" --text="package $pname installed"
+echo "$pname" >> packagesnames.txt
+else 
+zenity --entry --title="MAIN" --text="package $pname not installed"
+fi
+
+echo "$pname" >> packagesnames.txt
+	;;
+	-end)
+zenity --question --title="QUIT" --text="Are you sure you want to quit?"
+	;;
+	*)
+zenity --warning --title="Warning" --text="Choix incorrecte"
+	;;
+esac
+	;;
+	3)
+zenity --entry --title="MAIN" --text="
+Options:
+-end)Quit
+-inside)Afficher le nom de package dont une commande/fichier fait partie via <<nom_fichier>>.
+-list)Lister les composants d'un package via l'option <<nom_fichier>>.
+-desc)Afficher une description du package.
+Sauvegarder uniquement les noms de packages installes dans un fichier nommé packages_distribution_date.txt."
+	;;
+	4)
+zenity --question --title="QUIT" --text="Are you sure you want to quit?"
+	;;
+	*)
+zenity --warning --title="Warning" --text="Choix incorrecte"
+	;;
+esac
+done
+

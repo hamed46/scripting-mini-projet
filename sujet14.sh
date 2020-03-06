@@ -43,9 +43,16 @@ dpkg-query -s $pname
 
 		;;
 	-save)
+echo "package's name?"
+read pname
 clear
+test=$(dpkg-query -W -f'${Status}' "$pname" 2>/dev/null | grep -q "ok installed")
+if [ -n $test ]; then
 echo "package $pname installed"
 echo "$pname" >> packagesnames.txt
+else 
+	echo "package not installed"
+fi
 		;;
 	-help)
 echo "Options:"
@@ -148,9 +155,16 @@ echo "Votre choix?"
 read choix3
 case $choix3 in
 	-save)
+echo "package's name?"
+read pname
 clear
+test=$(dpkg-query -W -f'${Status}' "$pname" 2>/dev/null | grep -q "ok installed")
+if [ -n $test ]; then
 echo "package $pname installed"
 echo "$pname" >> packagesnames.txt
+else 
+	echo "package not installed"
+fi
 	;;
 	-end)
 echo "Quit"
